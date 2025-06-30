@@ -5,6 +5,7 @@ export type ValueType =
 	| "number"
 	| "boolean"
 	| "object"
+	| "string"
 	| "native-fn"
 	| "function";
 
@@ -12,9 +13,6 @@ export interface RuntimeVal {
 	type: ValueType;
 }
 
-/**
- * Defines a value of undefined meaning
- */
 export interface NullVal extends RuntimeVal {
 	type: "null";
 	value: null;
@@ -33,9 +31,6 @@ export function MK_BOOL(b = true) {
 	return { type: "boolean", value: b } as BooleanVal;
 }
 
-/**
- * Runtime value that has access to the raw native javascript number.
- */
 export interface NumberVal extends RuntimeVal {
 	type: "number";
 	value: number;
@@ -45,9 +40,6 @@ export function MK_NUMBER(n = 0) {
 	return { type: "number", value: n } as NumberVal;
 }
 
-/**
- * Runtime value that has access to the raw native javascript number.
- */
 export interface ObjectVal extends RuntimeVal {
 	type: "object";
 	properties: Map<string, RuntimeVal>;
@@ -69,4 +61,13 @@ export interface FunctionValue extends RuntimeVal {
 	parameters: string[];
 	declarationEnv: Environment;
 	body: Stmt[];
+}
+
+export interface StringVal extends RuntimeVal {
+	type: "string";
+	value: string;
+}
+
+export function MK_STRING(str = "") {
+	return { type: "string", value: str } as StringVal;
 }
