@@ -3,7 +3,7 @@ A language that can be in multiple forms, in one file extension, in one exe. Thi
 
 
 
-INSTALLATION INTO COMMAND LINE (Windows):
+INSTALLATION INTO COMMAND LINE WHICH DOESNT WORK YET (Windows):
 1. Download the correct exe for your computer.
 2. Put the exe somewhere safe.
 3. Open your Environment Variables.
