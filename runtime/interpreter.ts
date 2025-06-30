@@ -1,4 +1,4 @@
-import { NumberVal, RuntimeVal } from "./values.ts";
+import { MK_STRING, NumberVal, RuntimeVal } from "./values.ts";
 import {
 	AssignmentExpr,
 	BinaryExpr,
@@ -9,6 +9,7 @@ import {
 	ObjectLiteral,
 	Program,
 	Stmt,
+	StringLiteral,
 	VarDeclaration,
 } from "../frontend/ast.ts";
 import Environment from "./environment.ts";
@@ -42,14 +43,14 @@ export function evaluate(astNode: Stmt, env: Environment): RuntimeVal {
 			return eval_assignment(astNode as AssignmentExpr, env);
 		case "BinaryExpr":
 			return eval_binary_expr(astNode as BinaryExpr, env);
+		case "StringLiteral":
+			return MK_STRING((astNode as StringLiteral).value);
 		case "Program":
 			return eval_program(astNode as Program, env);
-		// Handle statements
 		case "VarDeclaration":
 			return eval_var_declaration(astNode as VarDeclaration, env);
 		case "FunctionDeclaration":
 			return eval_function_declaration(astNode as FunctionDeclaration, env);
-		// Handle unimplimented ast types as error.
 		default:
 			console.error(
 				"This AST Node has not yet been setup for interpretation.\n",
