@@ -13,14 +13,17 @@ export function createGlobalEnv() {
 	env.declareVar("false", MK_BOOL(false), true);
 	env.declareVar("null", MK_NULL(), true);
 
-	// Define a native builtin method
 	env.declareVar(
 		"print",
-		MK_NATIVE_FN((args, scope) => {
-			console.log(...args);
+		MK_NATIVE_FN((args, _scope) => {
+			const output = args.map(arg => {
+				if (arg.type === "object") return "[object]";
+				if ("value" in arg) return arg.value;
+				return arg;
+			});
+			console.log(...output);
 			return MK_NULL();
-		}),
-		true
+		}), true
 	);
 
 	function timeFunction(_args: RuntimeVal[], _env: Environment) {
@@ -61,7 +64,6 @@ export default class Environment {
 	public assignVar(varname: string, value: RuntimeVal): RuntimeVal {
 		const env = this.resolve(varname);
 
-		// Cannot assign to constant
 		if (env.constants.has(varname)) {
 			throw `Cannot reasign to variable ${varname} as it was declared constant.`;
 		}
