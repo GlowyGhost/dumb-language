@@ -10,10 +10,12 @@ import { evaluate } from "../interpreter.ts";
 import {
 	FunctionValue,
 	MK_NULL,
+	MK_STRING,
 	NativeFnValue,
 	NumberVal,
 	ObjectVal,
 	RuntimeVal,
+  StringVal,
 } from "../values.ts";
 
 function eval_numeric_binary_expr(
@@ -29,7 +31,6 @@ function eval_numeric_binary_expr(
 	} else if (operator == "*") {
 		result = lhs.value * rhs.value;
 	} else if (operator == "/") {
-		// TODO: Division by zero checks
 		result = lhs.value / rhs.value;
 	} else {
 		result = lhs.value % rhs.value;
@@ -38,26 +39,31 @@ function eval_numeric_binary_expr(
 	return { value: result, type: "number" };
 }
 
-/**
- * Evaulates expressions following the binary operation type.
- */
 export function eval_binary_expr(
 	binop: BinaryExpr,
 	env: Environment
 ): RuntimeVal {
 	const lhs = evaluate(binop.left, env);
 	const rhs = evaluate(binop.right, env);
-
-	// Only currently support numeric operations
 	if (lhs.type == "number" && rhs.type == "number") {
 		return eval_numeric_binary_expr(
 			lhs as NumberVal,
 			rhs as NumberVal,
 			binop.operator
 		);
-	}
+	} else {
+		if (lhs.type == "string" && rhs.type == "string") {
+			return MK_STRING((lhs as StringVal).value + (rhs as StringVal).value);
+		}
 
-	// One or both are NULL
+		if (lhs.type == "string" && rhs.type == "number") {
+			return MK_STRING((lhs as StringVal).value + (rhs as StringVal).value);
+		}
+
+		if (lhs.type == "number" && rhs.type == "string") {
+			return MK_STRING((lhs as StringVal).value + (rhs as StringVal).value);
+		}
+	}
 	return MK_NULL();
 }
 
@@ -109,16 +115,12 @@ export function eval_call_expr(expr: CallExpr, env: Environment): RuntimeVal {
 		const func = fn as FunctionValue;
 		const scope = new Environment(func.declarationEnv);
 
-		// Create the variables for the parameters list
 		for (let i = 0; i < func.parameters.length; i++) {
-			// TODO Check the bounds here.
-			// verify arity of function
 			const varname = func.parameters[i];
 			scope.declareVar(varname, args[i], false);
 		}
 
 		let result: RuntimeVal = MK_NULL();
-		// Evaluate the function body line by line
 		for (const stmt of func.body) {
 			result = evaluate(stmt, scope);
 		}
