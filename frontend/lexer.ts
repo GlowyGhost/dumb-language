@@ -59,6 +59,17 @@ export function tokenize(sourceCode: string): Token[] {
 	const src = sourceCode.split("");
 
 	while (src.length > 0) {
+		//Comment check
+		if (src[0] == "/" && src[1] == "/") {
+			src.shift();
+			src.shift();
+
+			while (src.length > 0 && (src[0] as string) != "\n" && (src[0] as string) != "\r") {
+				src.shift();
+			}
+			continue;
+		}
+
 		if (src[0] == "(") {
 			tokens.push(token(src.shift(), TokenType.OpenParen));
 		} else if (src[0] == ")") {
@@ -92,17 +103,17 @@ export function tokenize(sourceCode: string): Token[] {
 		} else if (src[0] == ".") {
 			tokens.push(token(src.shift(), TokenType.Dot));
 		}
-		else if (src[0] === '"') {
-			src.shift(); // remove opening quote
+		else if (src[0] == '"') {
+			src.shift();
 			let str = "";
-			while (src.length > 0 && src[0] !== '"') {
+			while (src.length > 0 && src[0] != '"') {
 				str += src.shift();
 			}
 			if (src.length === 0) {
 				console.error("Unterminated string literal");
 				Deno.exit(1);
 			}
-			src.shift(); // remove closing quote
+			src.shift();
 			tokens.push(token(str, TokenType.String));
 		}
 		else {
