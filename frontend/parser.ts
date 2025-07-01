@@ -1,4 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
+import Environment from "../runtime/environment.ts";
 import {
 	AssignmentExpr,
 	BinaryExpr,
@@ -44,8 +45,8 @@ export default class Parser {
 		return prev;
 	}
 
-	public produceAST(sourceCode: string): Program {
-		this.tokens = tokenize(sourceCode);
+	public produceAST(sourceCode: string, env: Environment): Program {
+		this.tokens = tokenize(sourceCode, env);
 		const program: Program = {
 			kind: "Program",
 			body: [],
@@ -61,10 +62,12 @@ export default class Parser {
 	private parse_stmt(): Stmt {
 		switch (this.at().type) {
 			case TokenType.Let:
+				return this.parse_var_declaration();
 			case TokenType.Const:
 				return this.parse_var_declaration();
 			case TokenType.Fn:
 				return this.parse_fn_declaration();
+
 			default:
 				return this.parse_expr();
 		}
