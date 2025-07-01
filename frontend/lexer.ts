@@ -1,3 +1,6 @@
+import Environment from "../runtime/environment.ts";
+import { newInclude } from "../runtime/import.ts";
+
 export enum TokenType {
 	// Literal Types
 	Number,
@@ -48,13 +51,19 @@ function isskippable(str: string) {
 	return str == " " || str == "\n" || str == "\t" || str == "\r";
 }
 
+function getGlobalEnv(env: Environment): Environment {
+	if (env.parent != undefined)
+		return getGlobalEnv(env.parent);
+	return env;
+}
+
 function isint(str: string) {
 	const c = str.charCodeAt(0);
 	const bounds = ["0".charCodeAt(0), "9".charCodeAt(0)];
 	return c >= bounds[0] && c <= bounds[1];
 }
 
-export function tokenize(sourceCode: string): Token[] {
+export function tokenize(sourceCode: string, env: Environment): Token[] {
 	const tokens = new Array<Token>();
 	const src = sourceCode.split("");
 
@@ -64,9 +73,18 @@ export function tokenize(sourceCode: string): Token[] {
 			src.shift();
 			src.shift();
 
+			let str = "";
+
 			while (src.length > 0 && (src[0] as string) != "\n" && (src[0] as string) != "\r") {
-				src.shift();
+				str = str + src.shift();
 			}
+
+			const flag = str.split(" ")[0];
+			
+			if (flag == "--i") {
+				newInclude(str.slice(4), getGlobalEnv(env));
+			}
+
 			continue;
 		}
 
