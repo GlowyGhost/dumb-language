@@ -43,12 +43,12 @@ async function repl(env: Environment) {
   	console.log("\nRepl v0.1");
 
   	while (true) {
-    	const input = prompt("> ");
-    	if (!input || input.includes("exit")) {
-      		break;
-    	}
-
-    	const program = parser.produceAST(input);
+	    	const input = prompt("> ");
+	    	if (!input || input.includes("exit")) {
+	      		break;
+	    	}
+	
+	    	const program = parser.produceAST(input);
     	
 		const result = evaluate(program, env)
   	}
