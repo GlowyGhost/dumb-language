@@ -27,7 +27,7 @@ async function findMode() {
 			Deno.exit(0);
 		} else if (input == "file") {
 			const input2 = prompt("fileDir > ");
-			if (!input2 && input2 != undefined) {
+			if (input2 != undefined) {
 				await run(input2, env);
 				Deno.exit(0);
 			}
